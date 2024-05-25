@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loans - Library Management System</title>
+    <link rel="stylesheet" href="loans.css">
+</head>
+<body>
+    <header>
+        <h1>Library Management System</h1>
+        <nav>
+            <ul>
+                <li><a href="/books">Books</a></li>
+                <li><a href="/patrons">Patrons</a></li>
+                <li><a href="/branches">Branches</a></li>
+                <li><a href="/loans">Loans</a></li>
+                <li><a href="/genres">Genres</a></li>
+            </ul>
+        </nav>
+    </header>
+    <section class="content">
+        <h2>Loans</h2>
+        <p>This page allows users to manage loans in the library.</p>
+
+        <!-- Form to Add a New Loan -->
+        <h3>Add a New Loan</h3>
+        <form action="/loans" method="POST">
+            <label for="patronID">Patron ID:</label>
+            <input type="number" id="patronID" name="patronID" required>
+            <label for="branchID">Branch ID:</label>
+            <input type="number" id="branchID" name="branchID" required>
+            <label for="beginDate">Begin Date:</label>
+            <input type="datetime-local" id="beginDate" name="beginDate" required>
+            <label for="expectedReturn">Expected Return:</label>
+            <input type="datetime-local" id="expectedReturn" name="expectedReturn" required>
+            <label for="overDueFee">Over Due Fee:</label>
+            <input type="number" id="overDueFee" name="overDueFee" required>
+            <button type="submit">Add Loan</button>
+        </form>
+
+        <!-- Table to Display Loans -->
+        <h3>Loan List</h3>
+        <table class="loan-table">
+            <thead>
+                <tr>
+                    <th>Loan ID</th>
+                    <th>Patron ID</th>
+                    <th>Branch ID</th>
+                    <th>Begin Date</th>
+                    <th>Expected Return</th>
+                    <th>Over Due Fee</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% loans.forEach(loan => { %>
+                    <tr>
+                        <td><%= loan.LoanID %></td>
+                        <td><%= loan.PatronID %></td>
+                        <td><%= loan.BranchID %></td>
+                        <td><%= loan.BeginDate %></td>
+                        <td><%= loan.ExpectedReturn %></td>
+                        <td><%= loan.OverDueFee %></td>
+                        <td>
+                            <!-- Form to Update Loan -->
+                            <form action="/loans/<%= loan.LoanID %>?_method=PUT" method="POST">
+                                <label for="patronID">Patron ID:</label>
+                                <input type="number" id="patronID" name="patronID" value="<%= loan.PatronID %>" required>
+                                <label for="branchID">Branch ID:</label>
+                                <input type="number" id="branchID" name="branchID" value="<%= loan.BranchID %>" required>
+                                <label for="beginDate">Begin Date:</label>
+                                <input type="datetime-local" id="beginDate" name="beginDate" value="<%= loan.BeginDate %>" required>
+                                <label for="expectedReturn">Expected Return:</label>
+                                <input type="datetime-local" id="expectedReturn" name="expectedReturn" value="<%= loan.ExpectedReturn %>" required>
+                                <label for="overDueFee">Over Due Fee:</label>
+                                <input type="number" id="overDueFee" name="overDueFee" value="<%= loan.OverDueFee %>" required>
+                                <button type="submit">Update</button>
+                            </form>
+
+                            <!-- Button to Delete Loan -->
+                            <form action="/loans/<%= loan.LoanID %>?_method=DELETE" method="POST">
+                                <button type="submit">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+
+        <!-- Form to Add a New Loan Detail -->
+        <h3>Add a New Loan Detail</h3>
+        <form action="/loan-details" method="POST">
+            <label for="loanID">Loan ID:</label>
+            <input type="number" id="loanID" name="loanID" required>
+            <label for="bookID">Book ID:</label>
+            <input type="number" id="bookID" name="bookID" required>
+            <label for="individualFee">Individual Fee:</label>
+            <input type="number" id="individualFee" name="individualFee" required>
+            <button type="submit">Add Loan Detail</button>
+        </form>
+
+        <!-- Table to Display Loan Details -->
+        <h3>Loan Detail List</h3>
+        <table class="loan-details-table">
+            <thead>
+                <tr>
+                    <th>Detail ID</th>
+                    <th>Loan ID</th>
+                    <th>Book ID</th>
+                    <th>Individual Fee</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% loanDetails.forEach(detail => { %>
+                    <tr>
+                        <td><%= detail.DetailID %></td>
+                        <td><%= detail.LoanID %></td>
+                        <td><%= detail.BookID %></td>
+                        <td><%= detail.IndividualFee %></td>
+                        <td>
+                            <!-- Form to Update Loan Detail -->
+                            <form action="/loan-details/<%= detail.DetailID %>?_method=PUT" method="POST">
+                                <label for="loanID">Loan ID:</label>
+                                <input type="number" id="loanID" name="loanID" value="<%= detail.LoanID %>" required>
+                                <label for="bookID">Book ID:</label>
+                                <input type="number" id="bookID" name="bookID" value="<%= detail.BookID %>" required>
+                                <label for="individualFee">Individual Fee:</label>
+                                <input type="number" id="individualFee" name="individualFee" value="<%= detail.IndividualFee %>" required>
+                                <button type="submit">Update</button>
+                            </form>
+
+                            <!-- Button to Delete Loan Detail -->
+                            <form action="/loan-details/<%= detail.DetailID %>?_method=DELETE" method="POST">
+                                <button type="submit">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+
+        <div class="return-btn">
+            <a href="/">Return to Home</a>
+        </div>
+    </section>
+    <footer>
+        <p>&copy; 2024 Library Management System, Ross, Cody, Andrew</p>
+    </footer>
+</body>
+</html>

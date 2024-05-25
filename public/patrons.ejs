@@ -11,17 +11,17 @@
         <h1>Library Management System</h1>
         <nav>
             <ul>
-                <li><a href="books.html">Books</a></li>
-                <li><a href="patrons.html">Patrons</a></li>
-                <li><a href="branches.html">Branches</a></li>
-                <li><a href="loans.html">Loans</a></li>
-                <li><a href="genres.html">Genres</a></li>
+                <li><a href="/books">Books</a></li>
+                <li><a href="/patrons">Patrons</a></li>
+                <li><a href="/branches">Branches</a></li>
+                <li><a href="/loans">Loans</a></li>
+                <li><a href="/genres">Genres</a></li>
             </ul>
         </nav>
     </header>
     <section class="content">
         <h2>Patrons</h2>
-        <!-- Sample table to display patron information -->
+        <p>This page allows users to manage patrons in the library.</p>
         <table class="patron-table">
             <thead>
                 <tr>
@@ -32,23 +32,18 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>john.doe@email.com</td>
-                    <td>$0.00</td>
-                    <td>123-456-7890</td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>jane.smith@email.com</td>
-                    <td>$5.00</td>
-                    <td>987-654-3210</td>
-                </tr>
-                <!-- Additional rows for more patrons -->
+                <% patrons.forEach(patron => { %>
+                    <tr>
+                        <td><%= patron.PatronID %></td>
+                        <td><%= patron.Email %></td>
+                        <td><%= patron.Dues %></td>
+                        <td><%= patron.PhoneNumber %></td>
+                    </tr>
+                <% }) %>
             </tbody>
         </table>
         <div class="return-btn">
-            <a href="index.html">Return to Home</a>
+            <a href="/">Return to Home</a>
         </div>
     </section>
     <footer>

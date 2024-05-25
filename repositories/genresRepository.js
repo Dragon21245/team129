@@ -1,52 +1,41 @@
 const db = require('../database/db-connector');
 
-function addGenre(genreName, callback) {
-  const sql = 'INSERT INTO Genres (GenreName) VALUES (?)';
-  db.pool.query(sql, [genreName], (err, result) => {
-    if (err) {
-      callback(err);
-      return;
-    }
-    callback(null, result);
-  });
-}
+exports.getAllGenres = (callback) => {
+    const query = 'SELECT * FROM Genres';
+    db.pool.query(query, (error, results) => {
+        if (error) {
+            return callback(error, null);
+        }
+        callback(null, results);
+    });
+};
 
-function updateGenre(genreID, newGenreName, callback) {
-  const sql = 'UPDATE Genres SET GenreName = ? WHERE GenreID = ?';
-  db.pool.query(sql, [newGenreName, genreID], (err, result) => {
-    if (err) {
-      callback(err);
-      return;
-    }
-    callback(null, result);
-  });
-}
+exports.addGenre = (genreName, callback) => {
+    const query = 'INSERT INTO Genres (GenreName) VALUES (?)';
+    db.pool.query(query, [genreName], (error, results) => {
+        if (error) {
+            return callback(error, null);
+        }
+        callback(null, results);
+    });
+};
 
-function deleteGenre(genreID, callback) {
-  const sql = 'DELETE FROM Genres WHERE GenreID = ?';
-  db.pool.query(sql, [genreID], (err, result) => {
-    if (err) {
-      callback(err);
-      return;
-    }
-    callback(null, result);
-  });
-}
+exports.updateGenre = (genreID, genreName, callback) => {
+    const query = 'UPDATE Genres SET GenreName = ? WHERE GenreID = ?';
+    db.pool.query(query, [genreName, genreID], (error, results) => {
+        if (error) {
+            return callback(error, null);
+        }
+        callback(null, results);
+    });
+};
 
-function getAllGenres(callback) {
-  const sql = 'SELECT * FROM Genres';
-  db.pool.query(sql, (err, result) => {
-    if (err) {
-      callback(err);
-      return;
-    }
-    callback(null, result);
-  });
-}
-
-module.exports = {
-  addGenre,
-  updateGenre,
-  deleteGenre,
-  getAllGenres
+exports.deleteGenre = (genreID, callback) => {
+    const query = 'DELETE FROM Genres WHERE GenreID = ?';
+    db.pool.query(query, [genreID], (error, results) => {
+        if (error) {
+            return callback(error, null);
+        }
+        callback(null, results);
+    });
 };

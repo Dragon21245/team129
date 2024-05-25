@@ -1,52 +1,41 @@
 const db = require('../database/db-connector');
 
-function addBranch(branchDescription, callback) {
-  const sql = 'INSERT INTO Branches (branchDescription) VALUES (?)';
-  db.pool.query(sql, [branchDescription], (err, result) => {
-    if (err) {
-      callback(err);
-      return;
-    }
-    callback(null, result);
-  });
-}
+exports.getAllBranches = (callback) => {
+    const query = 'SELECT * FROM Branches';
+    db.pool.query(query, (error, results) => {
+        if (error) {
+            return callback(error, null);
+        }
+        callback(null, results);
+    });
+};
 
-function updateBranch(branchID, newDescription, callback) {
-  const sql = 'UPDATE Branches SET branchDescription = ? WHERE branchID = ?';
-  db.pool.query(sql, [newDescription, branchID], (err, result) => {
-    if (err) {
-      callback(err);
-      return;
-    }
-    callback(null, result);
-  });
-}
+exports.addBranch = (branchDescription, callback) => {
+    const query = 'INSERT INTO Branches (BranchDescription) VALUES (?)';
+    db.pool.query(query, [branchDescription], (error, results) => {
+        if (error) {
+            return callback(error, null);
+        }
+        callback(null, results);
+    });
+};
 
-function deleteBranch(branchID, callback) {
-  const sql = 'DELETE FROM Branches WHERE branchID = ?';
-  db.pool.query(sql, [branchID], (err, result) => {
-    if (err) {
-      callback(err);
-      return;
-    }
-    callback(null, result);
-  });
-}
+exports.updateBranch = (branchID, branchDescription, callback) => {
+    const query = 'UPDATE Branches SET BranchDescription = ? WHERE BranchID = ?';
+    db.pool.query(query, [branchDescription, branchID], (error, results) => {
+        if (error) {
+            return callback(error, null);
+        }
+        callback(null, results);
+    });
+};
 
-function getAllBranches(callback) {
-  const sql = 'SELECT * FROM Branches';
-  db.pool.query(sql, (err, result) => {
-    if (err) {
-      callback(err);
-      return;
-    }
-    callback(null, result);
-  });
-}
-
-module.exports = {
-  addBranch,
-  updateBranch,
-  deleteBranch,
-  getAllBranches
+exports.deleteBranch = (branchID, callback) => {
+    const query = 'DELETE FROM Branches WHERE BranchID = ?';
+    db.pool.query(query, [branchID], (error, results) => {
+        if (error) {
+            return callback(error, null);
+        }
+        callback(null, results);
+    });
 };

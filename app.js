@@ -1,6 +1,8 @@
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
+const methodOverride = require('method-override');
+const db = require('./database/db-connector'); // Importing the database connector
 
 const branchesRepo = require('./repositories/branchesRepository');
 const genresRepo = require('./repositories/genresRepository');
@@ -16,33 +18,78 @@ const HOSTNAME = 'classwork.engr.oregonstate.edu'; // Setting the hostname
 
 // Set EJS as the templating engine
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, 'public'));
 
 // Use body-parser to parse JSON bodies into JS objects
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+// Use method-override to support PUT and DELETE methods in forms
+app.use(methodOverride('_method'));
+
 // Serving static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-/*
-    ROUTES
-*/
-
-app.get('/', function(req, res) {
+// Route for the root URL '/'
+app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.get('/search-loans', function(req, res) {
+// Route for searching loans by patron phone number
+app.get('/search-loans', (req, res) => {
     const phoneNumber = req.query.phoneNumber;
-    const query = `SELECT * FROM LoanHeader WHERE PatronID IN (SELECT PatronID FROM Patrons WHERE PhoneNumber = ?)`;
-    db.pool.query(query, [phoneNumber], (error, results) => {
+    loanHeaderRepo.getLoanByPhoneNumber(phoneNumber, (error, results) => {
         if (error) {
             console.error('Error searching loans:', error);
             res.status(500).send('Error searching loans. Please try again later.');
             return;
         }
         res.json(results);
+    });
+});
+
+// Books routes
+app.get('/books', (req, res) => {
+    booksRepo.getAllBooks((err, books) => {
+        if (err) {
+            res.status(500).send('Error getting books');
+        } else {
+            res.render('books', { books });
+        }
+    });
+});
+
+app.post('/books', (req, res) => {
+    const { title, author, isbn, branchID } = req.body;
+    booksRepo.addBook(title, author, isbn, branchID, (err, result) => {
+        if (err) {
+            res.status(500).send('Error adding book');
+        } else {
+            res.redirect('/books');
+        }
+    });
+});
+
+app.put('/books/:id', (req, res) => {
+    const bookID = req.params.id;
+    const { title, author, isbn, branchID } = req.body;
+    booksRepo.updateBook(bookID, title, author, isbn, branchID, (err, result) => {
+        if (err) {
+            res.status(500).send('Error updating book');
+        } else {
+            res.status(200).send('Book updated successfully');
+        }
+    });
+});
+
+app.delete('/books/:id', (req, res) => {
+    const bookID = req.params.id;
+    booksRepo.deleteBook(bookID, (err, result) => {
+        if (err) {
+            res.status(500).send('Error deleting book');
+        } else {
+            res.status(200).send('Book deleted successfully');
+        }
     });
 });
 
@@ -181,119 +228,70 @@ app.delete('/patrons/:id', (req, res) => {
     });
 });
 
-// Books routes
-app.get('/books', (req, res) => {
-    booksRepo.getAllBooks((err, books) => {
+// Loans routes
+app.get('/loans', (req, res) => {
+    loanHeaderRepo.getAllLoans((err, loans) => {
         if (err) {
-            res.status(500).send('Error getting books');
+            res.status(500).send('Error getting loans');
         } else {
-            res.render('books', { books });
+            loanDetailsRepo.getAllLoanDetails((err, loanDetails) => {
+                if (err) {
+                    res.status(500).send('Error getting loan details');
+                } else {
+                    res.render('loans', { loans, loanDetails });
+                }
+            });
         }
     });
 });
 
-app.post('/books', (req, res) => {
-    const { title, author, isbn, branchID } = req.body;
-    booksRepo.addBook(title, author, isbn, branchID, (err, result) => {
+app.post('/loans', (req, res) => {
+    const { patronID, branchID, beginDate, expectedReturn, overDueFee } = req.body;
+    loanHeaderRepo.addLoan(patronID, branchID, beginDate, expectedReturn, overDueFee, (err, result) => {
         if (err) {
-            res.status(500).send('Error adding book');
+            res.status(500).send('Error adding loan');
         } else {
-            res.redirect('/books');
+            res.redirect('/loans');
         }
     });
 });
 
-app.put('/books/:id', (req, res) => {
-    const bookID = req.params.id;
-    const { title, author, isbn, branchID } = req.body;
-    booksRepo.updateBook(bookID, title, author, isbn, branchID, (err, result) => {
-        if (err) {
-            res.status(500).send('Error updating book');
-        } else {
-            res.status(200).send('Book updated successfully');
-        }
-    });
-});
-
-app.delete('/books/:id', (req, res) => {
-    const bookID = req.params.id;
-    booksRepo.deleteBook(bookID, (err, result) => {
-        if (err) {
-            res.status(500).send('Error deleting book');
-        } else {
-            res.status(200).send('Book deleted successfully');
-        }
-    });
-});
-
-// LoanHeader routes
-app.get('/loanheaders', (req, res) => {
-    loanHeaderRepo.getAllLoanHeaders((err, loanHeaders) => {
-        if (err) {
-            res.status(500).send('Error getting loan headers');
-        } else {
-            res.render('loanheaders', { loanHeaders });
-        }
-    });
-});
-
-app.post('/loanheaders', (req, res) => {
-    const { patronID, branchID, beginDate, expectedReturn, overdueFee } = req.body;
-    loanHeaderRepo.addLoanHeader(patronID, branchID, beginDate, expectedReturn, overdueFee, (err, result) => {
-        if (err) {
-            res.status(500).send('Error adding loan header');
-        } else {
-            res.redirect('/loanheaders');
-        }
-    });
-});
-
-app.put('/loanheaders/:id', (req, res) => {
+app.put('/loans/:id', (req, res) => {
     const loanID = req.params.id;
-    const { patronID, branchID, beginDate, expectedReturn, overdueFee } = req.body;
-    loanHeaderRepo.updateLoanHeader(loanID, patronID, branchID, beginDate, expectedReturn, overdueFee, (err, result) => {
+    const { patronID, branchID, beginDate, expectedReturn, overDueFee } = req.body;
+    loanHeaderRepo.updateLoan(loanID, patronID, branchID, beginDate, expectedReturn, overDueFee, (err, result) => {
         if (err) {
-            res.status(500).send('Error updating loan header');
+            res.status(500).send('Error updating loan');
         } else {
-            res.status(200).send('Loan header updated successfully');
+            res.status(200).send('Loan updated successfully');
         }
     });
 });
 
-app.delete('/loanheaders/:id', (req, res) => {
+app.delete('/loans/:id', (req, res) => {
     const loanID = req.params.id;
-    loanHeaderRepo.deleteLoanHeader(loanID, (err, result) => {
+    loanHeaderRepo.deleteLoan(loanID, (err, result) => {
         if (err) {
-            res.status(500).send('Error deleting loan header');
+            res.status(500).send('Error deleting loan');
         } else {
-            res.status(200).send('Loan header deleted successfully');
+            res.status(200).send('Loan deleted successfully');
         }
     });
 });
 
-// LoanDetails routes
-app.get('/loandetails', (req, res) => {
-    loanDetailsRepo.getAllLoanDetails((err, loanDetails) => {
-        if (err) {
-            res.status(500).send('Error getting loan details');
-        } else {
-            res.render('loandetails', { loanDetails });
-        }
-    });
-});
-
-app.post('/loandetails', (req, res) => {
+// LoanDetails routes within Loans
+app.post('/loan-details', (req, res) => {
     const { loanID, bookID, individualFee } = req.body;
     loanDetailsRepo.addLoanDetail(loanID, bookID, individualFee, (err, result) => {
         if (err) {
             res.status(500).send('Error adding loan detail');
         } else {
-            res.redirect('/loandetails');
+            res.redirect('/loans');
         }
     });
 });
 
-app.put('/loandetails/:id', (req, res) => {
+app.put('/loan-details/:id', (req, res) => {
     const detailID = req.params.id;
     const { loanID, bookID, individualFee } = req.body;
     loanDetailsRepo.updateLoanDetail(detailID, loanID, bookID, individualFee, (err, result) => {
@@ -305,7 +303,7 @@ app.put('/loandetails/:id', (req, res) => {
     });
 });
 
-app.delete('/loandetails/:id', (req, res) => {
+app.delete('/loan-details/:id', (req, res) => {
     const detailID = req.params.id;
     loanDetailsRepo.deleteLoanDetail(detailID, (err, result) => {
         if (err) {
@@ -316,10 +314,7 @@ app.delete('/loandetails/:id', (req, res) => {
     });
 });
 
-/*
-    LISTENER
-*/
-
+// Start the server
 app.listen(PORT, HOSTNAME, function() {
     console.log(`Express started on http://${HOSTNAME}:${PORT}; press Ctrl-C to terminate.`);
 });

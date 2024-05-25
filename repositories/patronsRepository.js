@@ -1,52 +1,43 @@
 const db = require('../database/db-connector');
 
-function addPatron(email, dues, phoneNumber, callback) {
-  const sql = 'INSERT INTO Patrons (Email, Dues, PhoneNumber) VALUES (?, ?, ?)';
-  db.pool.query(sql, [email, dues, phoneNumber], (err, result) => {
-    if (err) {
-      callback(err);
-      return;
-    }
-    callback(null, result);
-  });
-}
+exports.getAllPatrons = (callback) => {
+    const query = 'SELECT * FROM Patrons';
+    db.pool.query(query, (error, results) => {
+        if (error) {
+            return callback(error, null);
+        }
+        callback(null, results);
+    });
+};
 
-function updatePatron(patronID, email, dues, phoneNumber, callback) {
-  const sql = 'UPDATE Patrons SET Email = ?, Dues = ?, PhoneNumber = ? WHERE PatronID = ?';
-  db.pool.query(sql, [email, dues, phoneNumber, patronID], (err, result) => {
-    if (err) {
-      callback(err);
-      return;
-    }
-    callback(null, result);
-  });
-}
+exports.addPatron = (email, dues, phoneNumber, callback) => {
+    const query = 'INSERT INTO Patrons (Email, Dues, PhoneNumber) VALUES (?, ?, ?)';
+    const values = [email, dues, phoneNumber];
+    db.pool.query(query, values, (error, results) => {
+        if (error) {
+            return callback(error, null);
+        }
+        callback(null, results);
+    });
+};
 
-function deletePatron(patronID, callback) {
-  const sql = 'DELETE FROM Patrons WHERE PatronID = ?';
-  db.pool.query(sql, [patronID], (err, result) => {
-    if (err) {
-      callback(err);
-      return;
-    }
-    callback(null, result);
-  });
-}
+exports.updatePatron = (patronID, email, dues, phoneNumber, callback) => {
+    const query = 'UPDATE Patrons SET Email = ?, Dues = ?, PhoneNumber = ? WHERE PatronID = ?';
+    const values = [email, dues, phoneNumber, patronID];
+    db.pool.query(query, values, (error, results) => {
+        if (error) {
+            return callback(error, null);
+        }
+        callback(null, results);
+    });
+};
 
-function getAllPatrons(callback) {
-  const sql = 'SELECT * FROM Patrons';
-  db.pool.query(sql, (err, result) => {
-    if (err) {
-      callback(err);
-      return;
-    }
-    callback(null, result);
-  });
-}
-
-module.exports = {
-  addPatron,
-  updatePatron,
-  deletePatron,
-  getAllPatrons
+exports.deletePatron = (patronID, callback) => {
+    const query = 'DELETE FROM Patrons WHERE PatronID = ?';
+    db.pool.query(query, [patronID], (error, results) => {
+        if (error) {
+            return callback(error, null);
+        }
+        callback(null, results);
+    });
 };
