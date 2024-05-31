@@ -22,6 +22,21 @@
     <section class="content">
         <h2>Patrons</h2>
         <p>This page allows users to manage patrons in the library.</p>
+
+        <!-- Form to Add a New Patron -->
+        <h3>Add a New Patron</h3>
+        <form action="/patrons" method="POST">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+            <label for="dues">Dues:</label>
+            <input type="number" id="dues" name="dues" required>
+            <label for="phoneNumber">Phone Number:</label>
+            <input type="text" id="phoneNumber" name="phoneNumber" required>
+            <button type="submit">Add Patron</button>
+        </form>
+
+        <!-- Table to Display Patrons -->
+        <h3>Patron List</h3>
         <table class="patron-table">
             <thead>
                 <tr>
@@ -29,6 +44,7 @@
                     <th>Email</th>
                     <th>Dues</th>
                     <th>Phone Number</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -38,10 +54,28 @@
                         <td><%= patron.Email %></td>
                         <td><%= patron.Dues %></td>
                         <td><%= patron.PhoneNumber %></td>
+                        <td>
+                            <!-- Form to Update Patron -->
+                            <form action="/patrons/<%= patron.PatronID %>?_method=PUT" method="POST">
+                                <label for="email">Email:</label>
+                                <input type="email" id="email" name="email" value="<%= patron.Email %>" required>
+                                <label for="dues">Dues:</label>
+                                <input type="number" id="dues" name="dues" value="<%= patron.Dues %>" required>
+                                <label for="phoneNumber">Phone Number:</label>
+                                <input type="text" id="phoneNumber" name="phoneNumber" value="<%= patron.PhoneNumber %>" required>
+                                <button type="submit">Update</button>
+                            </form>
+
+                            <!-- Button to Delete Patron -->
+                            <form action="/patrons/<%= patron.PatronID %>?_method=DELETE" method="POST">
+                                <button type="submit">Delete</button>
+                            </form>
+                        </td>
                     </tr>
                 <% }) %>
             </tbody>
         </table>
+
         <div class="return-btn">
             <a href="/">Return to Home</a>
         </div>
