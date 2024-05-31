@@ -59,29 +59,31 @@
                         <td><%= loan.LoanID %></td>
                         <td><%= loan.PatronID %></td>
                         <td><%= loan.BranchID %></td>
-                        <td><%= loan.BeginDate %></td>
-                        <td><%= loan.ExpectedReturn %></td>
+                        <td><%= new Date(loan.BeginDate).toISOString().slice(0, 16) %></td>
+                        <td><%= new Date(loan.ExpectedReturn).toISOString().slice(0, 16) %></td>
                         <td><%= loan.OverDueFee %></td>
-                        <td>
-                            <!-- Form to Update Loan -->
-                            <form action="/loans/<%= loan.LoanID %>?_method=PUT" method="POST">
-                                <label for="patronID">Patron ID:</label>
-                                <input type="number" id="patronID" name="patronID" value="<%= loan.PatronID %>" required>
-                                <label for="branchID">Branch ID:</label>
-                                <input type="number" id="branchID" name="branchID" value="<%= loan.BranchID %>" required>
-                                <label for="beginDate">Begin Date:</label>
-                                <input type="datetime-local" id="beginDate" name="beginDate" value="<%= loan.BeginDate %>" required>
-                                <label for="expectedReturn">Expected Return:</label>
-                                <input type="datetime-local" id="expectedReturn" name="expectedReturn" value="<%= loan.ExpectedReturn %>" required>
-                                <label for="overDueFee">Over Due Fee:</label>
-                                <input type="number" id="overDueFee" name="overDueFee" value="<%= loan.OverDueFee %>" required>
-                                <button type="submit">Update</button>
-                            </form>
-
-                            <!-- Button to Delete Loan -->
-                            <form action="/loans/<%= loan.LoanID %>?_method=DELETE" method="POST">
-                                <button type="submit">Delete</button>
-                            </form>
+                        <td class="actions">
+                            <div class="action-form">
+                                <form action="/loans/<%= loan.LoanID %>?_method=PUT" method="POST">
+                                    <input type="hidden" name="loanID" value="<%= loan.LoanID %>" required>
+                                    <label for="patronID">Patron ID:</label>
+                                    <input type="number" id="patronID" name="patronID" value="<%= loan.PatronID %>" required>
+                                    <label for="branchID">Branch ID:</label>
+                                    <input type="number" id="branchID" name="branchID" value="<%= loan.BranchID %>" required>
+                                    <label for="beginDate">Begin Date:</label>
+                                    <input type="datetime-local" id="beginDate" name="beginDate" value="<%= new Date(loan.BeginDate).toISOString().slice(0, 16) %>" required>
+                                    <label for="expectedReturn">Expected Return:</label>
+                                    <input type="datetime-local" id="expectedReturn" name="expectedReturn" value="<%= new Date(loan.ExpectedReturn).toISOString().slice(0, 16) %>" required>
+                                    <label for="overDueFee">Over Due Fee:</label>
+                                    <input type="number" id="overDueFee" name="overDueFee" value="<%= loan.OverDueFee %>" required>
+                                    <button type="submit" class="action-btn update">Update</button>
+                                </form>
+                            </div>
+                            <div class="action-form">
+                                <form action="/loans/<%= loan.LoanID %>?_method=DELETE" method="POST">
+                                    <button type="submit" class="action-btn delete">Delete</button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 <% }) %>
@@ -119,22 +121,24 @@
                         <td><%= detail.LoanID %></td>
                         <td><%= detail.BookID %></td>
                         <td><%= detail.IndividualFee %></td>
-                        <td>
-                            <!-- Form to Update Loan Detail -->
-                            <form action="/loan-details/<%= detail.DetailID %>?_method=PUT" method="POST">
-                                <label for="loanID">Loan ID:</label>
-                                <input type="number" id="loanID" name="loanID" value="<%= detail.LoanID %>" required>
-                                <label for="bookID">Book ID:</label>
-                                <input type="number" id="bookID" name="bookID" value="<%= detail.BookID %>" required>
-                                <label for="individualFee">Individual Fee:</label>
-                                <input type="number" id="individualFee" name="individualFee" value="<%= detail.IndividualFee %>" required>
-                                <button type="submit">Update</button>
-                            </form>
-
-                            <!-- Button to Delete Loan Detail -->
-                            <form action="/loan-details/<%= detail.DetailID %>?_method=DELETE" method="POST">
-                                <button type="submit">Delete</button>
-                            </form>
+                        <td class="actions">
+                            <div class="action-form">
+                                <form action="/loan-details/<%= detail.DetailID %>?_method=PUT" method="POST">
+                                    <input type="hidden" name="detailID" value="<%= detail.DetailID %>" required>
+                                    <label for="loanID">Loan ID:</label>
+                                    <input type="number" id="loanID" name="loanID" value="<%= detail.LoanID %>" required>
+                                    <label for="bookID">Book ID:</label>
+                                    <input type="number" id="bookID" name="bookID" value="<%= detail.BookID %>" required>
+                                    <label for="individualFee">Individual Fee:</label>
+                                    <input type="number" id="individualFee" name="individualFee" value="<%= detail.IndividualFee %>" required>
+                                    <button type="submit" class="action-btn update">Update</button>
+                                </form>
+                            </div>
+                            <div class="action-form">
+                                <form action="/loan-details/<%= detail.DetailID %>?_method=DELETE" method="POST">
+                                    <button type="submit" class="action-btn delete">Delete</button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 <% }) %>

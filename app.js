@@ -30,6 +30,12 @@ app.use(methodOverride('_method'));
 // Serving static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Middleware to pass error messages to the views
+app.use((req, res, next) => {
+    res.locals.errorMessage = null;
+    next();
+});
+
 // Route for the root URL '/'
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
@@ -40,11 +46,11 @@ app.get('/search-loans', (req, res) => {
     const phoneNumber = req.query.phoneNumber;
     loanHeaderRepo.getLoanByPhoneNumber(phoneNumber, (error, results) => {
         if (error) {
-            console.error('Error searching loans:', error);
-            res.status(500).send('Error searching loans. Please try again later.');
-            return;
+            res.locals.errorMessage = 'Error searching loans. Please try again later.';
+            res.render('index'); // Adjust this to the appropriate view
+        } else {
+            res.json(results);
         }
-        res.json(results);
     });
 });
 
@@ -52,7 +58,8 @@ app.get('/search-loans', (req, res) => {
 app.get('/books', (req, res) => {
     booksRepo.getAllBooks((err, books) => {
         if (err) {
-            res.status(500).send('Error getting books');
+            res.locals.errorMessage = 'Error getting books';
+            res.render('books', { books: [] });
         } else {
             res.render('books', { books });
         }
@@ -63,7 +70,8 @@ app.post('/books', (req, res) => {
     const { title, author, isbn, branchID } = req.body;
     booksRepo.addBook(title, author, isbn, branchID, (err, result) => {
         if (err) {
-            res.status(500).send('Error adding book');
+            res.locals.errorMessage = 'Error adding book';
+            res.render('books', { books: [] });
         } else {
             res.redirect('/books');
         }
@@ -75,9 +83,10 @@ app.put('/books/:id', (req, res) => {
     const { title, author, isbn, branchID } = req.body;
     booksRepo.updateBook(bookID, title, author, isbn, branchID, (err, result) => {
         if (err) {
-            res.status(500).send('Error updating book');
+            res.locals.errorMessage = 'Error updating book';
+            res.redirect('/books');
         } else {
-            res.status(200).send('Book updated successfully');
+            res.redirect('/books'); // Redirects to the Books page after update
         }
     });
 });
@@ -86,9 +95,10 @@ app.delete('/books/:id', (req, res) => {
     const bookID = req.params.id;
     booksRepo.deleteBook(bookID, (err, result) => {
         if (err) {
-            res.status(500).send('Error deleting book');
+            res.locals.errorMessage = 'Error deleting book';
+            res.redirect('/books');
         } else {
-            res.status(200).send('Book deleted successfully');
+            res.redirect('/books'); // Redirects to the Books page after deletion
         }
     });
 });
@@ -97,7 +107,8 @@ app.delete('/books/:id', (req, res) => {
 app.get('/branches', (req, res) => {
     branchesRepo.getAllBranches((err, branches) => {
         if (err) {
-            res.status(500).send('Error getting branches');
+            res.locals.errorMessage = 'Error getting branches';
+            res.render('branches', { branches: [] });
         } else {
             res.render('branches', { branches });
         }
@@ -108,7 +119,8 @@ app.post('/branches', (req, res) => {
     const { branchDescription } = req.body;
     branchesRepo.addBranch(branchDescription, (err, result) => {
         if (err) {
-            res.status(500).send('Error adding branch');
+            res.locals.errorMessage = 'Error adding branch';
+            res.redirect('/branches');
         } else {
             res.redirect('/branches');
         }
@@ -120,9 +132,10 @@ app.put('/branches/:id', (req, res) => {
     const { branchDescription } = req.body;
     branchesRepo.updateBranch(branchID, branchDescription, (err, result) => {
         if (err) {
-            res.status(500).send('Error updating branch');
+            res.locals.errorMessage = 'Error updating branch';
+            res.redirect('/branches');
         } else {
-            res.status(200).send('Branch updated successfully');
+            res.redirect('/branches'); // Redirects to the Branches page after update
         }
     });
 });
@@ -131,9 +144,10 @@ app.delete('/branches/:id', (req, res) => {
     const branchID = req.params.id;
     branchesRepo.deleteBranch(branchID, (err, result) => {
         if (err) {
-            res.status(500).send('Error deleting branch');
+            res.locals.errorMessage = 'Error deleting branch';
+            res.redirect('/branches');
         } else {
-            res.status(200).send('Branch deleted successfully');
+            res.redirect('/branches'); // Redirects to the Branches page after deletion
         }
     });
 });
@@ -142,7 +156,8 @@ app.delete('/branches/:id', (req, res) => {
 app.get('/genres', (req, res) => {
     genresRepo.getAllGenres((err, genres) => {
         if (err) {
-            res.status(500).send('Error getting genres');
+            res.locals.errorMessage = 'Error getting genres';
+            res.render('genres', { genres: [] });
         } else {
             res.render('genres', { genres });
         }
@@ -153,7 +168,8 @@ app.post('/genres', (req, res) => {
     const { genreName } = req.body;
     genresRepo.addGenre(genreName, (err, result) => {
         if (err) {
-            res.status(500).send('Error adding genre');
+            res.locals.errorMessage = 'Error adding genre';
+            res.redirect('/genres');
         } else {
             res.redirect('/genres');
         }
@@ -165,9 +181,10 @@ app.put('/genres/:id', (req, res) => {
     const { genreName } = req.body;
     genresRepo.updateGenre(genreID, genreName, (err, result) => {
         if (err) {
-            res.status(500).send('Error updating genre');
+            res.locals.errorMessage = 'Error updating genre';
+            res.redirect('/genres');
         } else {
-            res.status(200).send('Genre updated successfully');
+            res.redirect('/genres'); // Redirects to the Genres page after update
         }
     });
 });
@@ -176,9 +193,10 @@ app.delete('/genres/:id', (req, res) => {
     const genreID = req.params.id;
     genresRepo.deleteGenre(genreID, (err, result) => {
         if (err) {
-            res.status(500).send('Error deleting genre');
+            res.locals.errorMessage = 'Error deleting genre';
+            res.redirect('/genres');
         } else {
-            res.status(200).send('Genre deleted successfully');
+            res.redirect('/genres'); // Redirects to the Genres page after deletion
         }
     });
 });
@@ -187,7 +205,8 @@ app.delete('/genres/:id', (req, res) => {
 app.get('/patrons', (req, res) => {
     patronsRepo.getAllPatrons((err, patrons) => {
         if (err) {
-            res.status(500).send('Error getting patrons');
+            res.locals.errorMessage = 'Error getting patrons';
+            res.render('patrons', { patrons: [] });
         } else {
             res.render('patrons', { patrons });
         }
@@ -198,7 +217,8 @@ app.post('/patrons', (req, res) => {
     const { email, dues, phoneNumber } = req.body;
     patronsRepo.addPatron(email, dues, phoneNumber, (err, result) => {
         if (err) {
-            res.status(500).send('Error adding patron');
+            res.locals.errorMessage = 'Error adding patron';
+            res.redirect('/patrons');
         } else {
             res.redirect('/patrons');
         }
@@ -210,9 +230,10 @@ app.put('/patrons/:id', (req, res) => {
     const { email, dues, phoneNumber } = req.body;
     patronsRepo.updatePatron(patronID, email, dues, phoneNumber, (err, result) => {
         if (err) {
-            res.status(500).send('Error updating patron');
+            res.locals.errorMessage = 'Error updating patron';
+            res.redirect('/patrons');
         } else {
-            res.status(200).send('Patron updated successfully');
+            res.redirect('/patrons'); // Redirects to the Patrons page after update
         }
     });
 });
@@ -221,9 +242,10 @@ app.delete('/patrons/:id', (req, res) => {
     const patronID = req.params.id;
     patronsRepo.deletePatron(patronID, (err, result) => {
         if (err) {
-            res.status(500).send('Error deleting patron');
+            res.locals.errorMessage = 'Error deleting patron';
+            res.redirect('/patrons');
         } else {
-            res.status(200).send('Patron deleted successfully');
+            res.redirect('/patrons'); // Redirects to the Patrons page after deletion
         }
     });
 });
@@ -232,11 +254,13 @@ app.delete('/patrons/:id', (req, res) => {
 app.get('/loans', (req, res) => {
     loanHeaderRepo.getAllLoans((err, loans) => {
         if (err) {
-            res.status(500).send('Error getting loans');
+            res.locals.errorMessage = 'Error getting loans';
+            res.render('loans', { loans: [], loanDetails: [] });
         } else {
             loanDetailsRepo.getAllLoanDetails((err, loanDetails) => {
                 if (err) {
-                    res.status(500).send('Error getting loan details');
+                    res.locals.errorMessage = 'Error getting loan details';
+                    res.render('loans', { loans, loanDetails: [] });
                 } else {
                     res.render('loans', { loans, loanDetails });
                 }
@@ -249,7 +273,8 @@ app.post('/loans', (req, res) => {
     const { patronID, branchID, beginDate, expectedReturn, overDueFee } = req.body;
     loanHeaderRepo.addLoan(patronID, branchID, beginDate, expectedReturn, overDueFee, (err, result) => {
         if (err) {
-            res.status(500).send('Error adding loan');
+            res.locals.errorMessage = 'Error adding loan';
+            res.redirect('/loans');
         } else {
             res.redirect('/loans');
         }
@@ -261,9 +286,10 @@ app.put('/loans/:id', (req, res) => {
     const { patronID, branchID, beginDate, expectedReturn, overDueFee } = req.body;
     loanHeaderRepo.updateLoan(loanID, patronID, branchID, beginDate, expectedReturn, overDueFee, (err, result) => {
         if (err) {
-            res.status(500).send('Error updating loan');
+            res.locals.errorMessage = 'Error updating loan';
+            res.redirect('/loans');
         } else {
-            res.status(200).send('Loan updated successfully');
+            res.redirect('/loans'); // Redirects to the Loans page after update
         }
     });
 });
@@ -272,9 +298,10 @@ app.delete('/loans/:id', (req, res) => {
     const loanID = req.params.id;
     loanHeaderRepo.deleteLoan(loanID, (err, result) => {
         if (err) {
-            res.status(500).send('Error deleting loan');
+            res.locals.errorMessage = 'Error deleting loan';
+            res.redirect('/loans');
         } else {
-            res.status(200).send('Loan deleted successfully');
+            res.redirect('/loans'); // Redirects to the Loans page after deletion
         }
     });
 });
@@ -284,7 +311,8 @@ app.post('/loan-details', (req, res) => {
     const { loanID, bookID, individualFee } = req.body;
     loanDetailsRepo.addLoanDetail(loanID, bookID, individualFee, (err, result) => {
         if (err) {
-            res.status(500).send('Error adding loan detail');
+            res.locals.errorMessage = 'Error adding loan detail';
+            res.redirect('/loans');
         } else {
             res.redirect('/loans');
         }
@@ -296,9 +324,10 @@ app.put('/loan-details/:id', (req, res) => {
     const { loanID, bookID, individualFee } = req.body;
     loanDetailsRepo.updateLoanDetail(detailID, loanID, bookID, individualFee, (err, result) => {
         if (err) {
-            res.status(500).send('Error updating loan detail');
+            res.locals.errorMessage = 'Error updating loan detail';
+            res.redirect('/loans');
         } else {
-            res.status(200).send('Loan detail updated successfully');
+            res.redirect('/loans'); // Redirects to the Loans page after update
         }
     });
 });
@@ -307,9 +336,10 @@ app.delete('/loan-details/:id', (req, res) => {
     const detailID = req.params.id;
     loanDetailsRepo.deleteLoanDetail(detailID, (err, result) => {
         if (err) {
-            res.status(500).send('Error deleting loan detail');
+            res.locals.errorMessage = 'Error deleting loan detail';
+            res.redirect('/loans');
         } else {
-            res.status(200).send('Loan detail deleted successfully');
+            res.redirect('/loans'); // Redirects to the Loans page after deletion
         }
     });
 });
