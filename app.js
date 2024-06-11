@@ -1,7 +1,6 @@
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
-const methodOverride = require('method-override');
 const db = require('./database/db-connector'); // Importing the database connector
 
 const branchesRepo = require('./repositories/branchesRepository');
@@ -23,9 +22,6 @@ app.set('views', path.join(__dirname, 'public'));
 // Use body-parser to parse JSON bodies into JS objects
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-
-// Use method-override to support PUT and DELETE methods in forms
-app.use(methodOverride('_method'));
 
 // Serving static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
@@ -84,9 +80,8 @@ app.put('/books/:id', (req, res) => {
     booksRepo.updateBook(bookID, title, author, isbn, branchID, (err, result) => {
         if (err) {
             res.locals.errorMessage = 'Error updating book';
-            res.redirect('/books');
         } else {
-            res.redirect('/books'); // Redirects to the Books page after update
+            res.status(200).send({ redirect: '/books' });
         }
     });
 });
@@ -96,9 +91,8 @@ app.delete('/books/:id', (req, res) => {
     booksRepo.deleteBook(bookID, (err, result) => {
         if (err) {
             res.locals.errorMessage = 'Error deleting book';
-            res.redirect('/books');
         } else {
-            res.redirect('/books'); // Redirects to the Books page after deletion
+            res.status(200).send({ redirect: '/books' });
         }
     });
 });
@@ -133,9 +127,8 @@ app.put('/branches/:id', (req, res) => {
     branchesRepo.updateBranch(branchID, branchDescription, (err, result) => {
         if (err) {
             res.locals.errorMessage = 'Error updating branch';
-            res.redirect('/branches');
         } else {
-            res.redirect('/branches'); // Redirects to the Branches page after update
+            res.status(200).send({ redirect: '/branches' });
         }
     });
 });
@@ -145,9 +138,8 @@ app.delete('/branches/:id', (req, res) => {
     branchesRepo.deleteBranch(branchID, (err, result) => {
         if (err) {
             res.locals.errorMessage = 'Error deleting branch';
-            res.redirect('/branches');
         } else {
-            res.redirect('/branches'); // Redirects to the Branches page after deletion
+            res.status(200).send({ redirect: '/branches' });
         }
     });
 });
@@ -182,9 +174,8 @@ app.put('/genres/:id', (req, res) => {
     genresRepo.updateGenre(genreID, genreName, (err, result) => {
         if (err) {
             res.locals.errorMessage = 'Error updating genre';
-            res.redirect('/genres');
         } else {
-            res.redirect('/genres'); // Redirects to the Genres page after update
+            res.status(200).send({ redirect: '/genres' });
         }
     });
 });
@@ -194,9 +185,8 @@ app.delete('/genres/:id', (req, res) => {
     genresRepo.deleteGenre(genreID, (err, result) => {
         if (err) {
             res.locals.errorMessage = 'Error deleting genre';
-            res.redirect('/genres');
         } else {
-            res.redirect('/genres'); // Redirects to the Genres page after deletion
+            res.status(200).send({ redirect: '/genres' });
         }
     });
 });
@@ -231,9 +221,8 @@ app.put('/patrons/:id', (req, res) => {
     patronsRepo.updatePatron(patronID, email, dues, phoneNumber, (err, result) => {
         if (err) {
             res.locals.errorMessage = 'Error updating patron';
-            res.redirect('/patrons');
         } else {
-            res.redirect('/patrons'); // Redirects to the Patrons page after update
+            res.status(200).send({ redirect: '/patrons' });
         }
     });
 });
@@ -243,9 +232,8 @@ app.delete('/patrons/:id', (req, res) => {
     patronsRepo.deletePatron(patronID, (err, result) => {
         if (err) {
             res.locals.errorMessage = 'Error deleting patron';
-            res.redirect('/patrons');
         } else {
-            res.redirect('/patrons'); // Redirects to the Patrons page after deletion
+            res.status(200).send({ redirect: '/patrons' });
         }
     });
 });
@@ -287,9 +275,8 @@ app.put('/loans/:id', (req, res) => {
     loanHeaderRepo.updateLoan(loanID, patronID, branchID, beginDate, expectedReturn, overDueFee, (err, result) => {
         if (err) {
             res.locals.errorMessage = 'Error updating loan';
-            res.redirect('/loans');
         } else {
-            res.redirect('/loans'); // Redirects to the Loans page after update
+            res.status(200).send({ redirect: '/loans' });
         }
     });
 });
@@ -299,9 +286,8 @@ app.delete('/loans/:id', (req, res) => {
     loanHeaderRepo.deleteLoan(loanID, (err, result) => {
         if (err) {
             res.locals.errorMessage = 'Error deleting loan';
-            res.redirect('/loans');
         } else {
-            res.redirect('/loans'); // Redirects to the Loans page after deletion
+            res.status(200).send({ redirect: '/loans' });
         }
     });
 });
@@ -312,9 +298,8 @@ app.post('/loan-details', (req, res) => {
     loanDetailsRepo.addLoanDetail(loanID, bookID, individualFee, (err, result) => {
         if (err) {
             res.locals.errorMessage = 'Error adding loan detail';
-            res.redirect('/loans');
         } else {
-            res.redirect('/loans');
+            res.status(200).send({ redirect: '/loans' });
         }
     });
 });
@@ -325,9 +310,8 @@ app.put('/loan-details/:id', (req, res) => {
     loanDetailsRepo.updateLoanDetail(detailID, loanID, bookID, individualFee, (err, result) => {
         if (err) {
             res.locals.errorMessage = 'Error updating loan detail';
-            res.redirect('/loans');
         } else {
-            res.redirect('/loans'); // Redirects to the Loans page after update
+            res.status(200).send({ redirect: '/loans' });
         }
     });
 });
@@ -337,9 +321,8 @@ app.delete('/loan-details/:id', (req, res) => {
     loanDetailsRepo.deleteLoanDetail(detailID, (err, result) => {
         if (err) {
             res.locals.errorMessage = 'Error deleting loan detail';
-            res.redirect('/loans');
         } else {
-            res.redirect('/loans'); // Redirects to the Loans page after deletion
+            res.status(200).send({ redirect: '/loans' });
         }
     });
 });

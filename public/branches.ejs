@@ -48,14 +48,16 @@
                         <td><%= branch.BranchDescription %></td>
                         <td>
                             <!-- Form to Update Branch -->
-                            <form action="/branches/<%= branch.BranchID %>?_method=PUT" method="POST">
+                            <form id="update-form-<%= branch.BranchID %>" action="/branches/<%= branch.BranchID %>" method="POST" onsubmit="return handleFormSubmit(event, '<%= branch.BranchID %>', 'PUT')">
+                                <input type="hidden" name="_method" value="PUT">
                                 <label for="branchDescription">Branch Description:</label>
                                 <input type="text" id="branchDescription" name="branchDescription" value="<%= branch.BranchDescription %>" required>
                                 <button type="submit">Update</button>
                             </form>
 
                             <!-- Button to Delete Branch -->
-                            <form action="/branches/<%= branch.BranchID %>?_method=DELETE" method="POST">
+                            <form id="delete-form-<%= branch.BranchID %>" action="/branches/<%= branch.BranchID %>" method="POST" onsubmit="return handleFormSubmit(event, '<%= branch.BranchID %>', 'DELETE')">
+                                <input type="hidden" name="_method" value="DELETE">
                                 <button type="submit">Delete</button>
                             </form>
                         </td>
@@ -71,5 +73,26 @@
     <footer>
         <p>&copy; 2024 Library Management System, Ross, Cody, Andrew</p>
     </footer>
+    <script>
+        async function handleFormSubmit(event, id, method) {
+            event.preventDefault();
+            const form = event.target;
+            const action = form.action;
+
+            const response = await fetch(action, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams(new FormData(form))
+            });
+
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                console.error('An error occurred:', await response.text());
+            }
+        }
+    </script>
 </body>
 </html>

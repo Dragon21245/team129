@@ -56,7 +56,8 @@
                         <td><%= patron.PhoneNumber %></td>
                         <td>
                             <!-- Form to Update Patron -->
-                            <form action="/patrons/<%= patron.PatronID %>?_method=PUT" method="POST">
+                            <form id="update-form-<%= patron.PatronID %>" action="/patrons/<%= patron.PatronID %>" method="POST" onsubmit="return handleFormSubmit(event, '<%= patron.PatronID %>', 'PUT')">
+                                <input type="hidden" name="_method" value="PUT">
                                 <label for="email">Email:</label>
                                 <input type="email" id="email" name="email" value="<%= patron.Email %>" required>
                                 <label for="dues">Dues:</label>
@@ -67,7 +68,8 @@
                             </form>
 
                             <!-- Button to Delete Patron -->
-                            <form action="/patrons/<%= patron.PatronID %>?_method=DELETE" method="POST">
+                            <form id="delete-form-<%= patron.PatronID %>" action="/patrons/<%= patron.PatronID %>" method="POST" onsubmit="return handleFormSubmit(event, '<%= patron.PatronID %>', 'DELETE')">
+                                <input type="hidden" name="_method" value="DELETE">
                                 <button type="submit">Delete</button>
                             </form>
                         </td>
@@ -83,5 +85,26 @@
     <footer>
         <p>&copy; 2024 Library Management System, Ross, Cody, Andrew</p>
     </footer>
+    <script>
+        async function handleFormSubmit(event, id, method) {
+            event.preventDefault();
+            const form = event.target;
+            const action = form.action;
+
+            const response = await fetch(action, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams(new FormData(form))
+            });
+
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                console.error('An error occurred:', await response.text());
+            }
+        }
+    </script>
 </body>
 </html>

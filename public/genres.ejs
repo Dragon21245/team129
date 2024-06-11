@@ -48,14 +48,16 @@
                         <td><%= genre.GenreName %></td>
                         <td>
                             <!-- Form to Update Genre -->
-                            <form action="/genres/<%= genre.GenreID %>?_method=PUT" method="POST">
+                            <form id="update-form-<%= genre.GenreID %>" action="/genres/<%= genre.GenreID %>" method="POST" onsubmit="return handleFormSubmit(event, '<%= genre.GenreID %>', 'PUT')">
+                                <input type="hidden" name="_method" value="PUT">
                                 <label for="genreName">Genre Name:</label>
                                 <input type="text" id="genreName" name="genreName" value="<%= genre.GenreName %>" required>
                                 <button type="submit">Update</button>
                             </form>
 
                             <!-- Button to Delete Genre -->
-                            <form action="/genres/<%= genre.GenreID %>?_method=DELETE" method="POST">
+                            <form id="delete-form-<%= genre.GenreID %>" action="/genres/<%= genre.GenreID %>" method="POST" onsubmit="return handleFormSubmit(event, '<%= genre.GenreID %>', 'DELETE')">
+                                <input type="hidden" name="_method" value="DELETE">
                                 <button type="submit">Delete</button>
                             </form>
                         </td>
@@ -71,5 +73,26 @@
     <footer>
         <p>&copy; 2024 Library Management System, Ross, Cody, Andrew</p>
     </footer>
+    <script>
+        async function handleFormSubmit(event, id, method) {
+            event.preventDefault();
+            const form = event.target;
+            const action = form.action;
+
+            const response = await fetch(action, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams(new FormData(form))
+            });
+
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                console.error('An error occurred:', await response.text());
+            }
+        }
+    </script>
 </body>
 </html>

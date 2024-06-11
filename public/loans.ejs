@@ -50,7 +50,7 @@
                     <th>Begin Date</th>
                     <th>Expected Return</th>
                     <th>Over Due Fee</th>
-                    <th>Actions</th>
+                    <th>Actions</h>
                 </tr>
             </thead>
             <tbody>
@@ -62,28 +62,28 @@
                         <td><%= new Date(loan.BeginDate).toISOString().slice(0, 16) %></td>
                         <td><%= new Date(loan.ExpectedReturn).toISOString().slice(0, 16) %></td>
                         <td><%= loan.OverDueFee %></td>
-                        <td class="actions">
-                            <div class="action-form">
-                                <form action="/loans/<%= loan.LoanID %>?_method=PUT" method="POST">
-                                    <input type="hidden" name="loanID" value="<%= loan.LoanID %>" required>
-                                    <label for="patronID">Patron ID:</label>
-                                    <input type="number" id="patronID" name="patronID" value="<%= loan.PatronID %>" required>
-                                    <label for="branchID">Branch ID:</label>
-                                    <input type="number" id="branchID" name="branchID" value="<%= loan.BranchID %>" required>
-                                    <label for="beginDate">Begin Date:</label>
-                                    <input type="datetime-local" id="beginDate" name="beginDate" value="<%= new Date(loan.BeginDate).toISOString().slice(0, 16) %>" required>
-                                    <label for="expectedReturn">Expected Return:</label>
-                                    <input type="datetime-local" id="expectedReturn" name="expectedReturn" value="<%= new Date(loan.ExpectedReturn).toISOString().slice(0, 16) %>" required>
-                                    <label for="overDueFee">Over Due Fee:</label>
-                                    <input type="number" id="overDueFee" name="overDueFee" value="<%= loan.OverDueFee %>" required>
-                                    <button type="submit" class="action-btn update">Update</button>
-                                </form>
-                            </div>
-                            <div class="action-form">
-                                <form action="/loans/<%= loan.LoanID %>?_method=DELETE" method="POST">
-                                    <button type="submit" class="action-btn delete">Delete</button>
-                                </form>
-                            </div>
+                        <td>
+                            <!-- Form to Update Loan -->
+                            <form id="update-form-<%= loan.LoanID %>" action="/loans/<%= loan.LoanID %>" method="POST" onsubmit="return handleFormSubmit(event, '<%= loan.LoanID %>', 'PUT')">
+                                <input type="hidden" name="_method" value="PUT">
+                                <label for="patronID">Patron ID:</label>
+                                <input type="number" id="patronID" name="patronID" value="<%= loan.PatronID %>" required>
+                                <label for="branchID">Branch ID:</label>
+                                <input type="number" id="branchID" name="branchID" value="<%= loan.BranchID %>" required>
+                                <label for="beginDate">Begin Date:</label>
+                                <input type="datetime-local" id="beginDate" name="beginDate" value="<%= new Date(loan.BeginDate).toISOString().slice(0, 16) %>" required>
+                                <label for="expectedReturn">Expected Return:</label>
+                                <input type="datetime-local" id="expectedReturn" name="expectedReturn" value="<%= new Date(loan.ExpectedReturn).toISOString().slice(0, 16) %>" required>
+                                <label for="overDueFee">Over Due Fee:</label>
+                                <input type="number" id="overDueFee" name="overDueFee" value="<%= loan.OverDueFee %>" required>
+                                <button type="submit">Update</button>
+                            </form>
+
+                            <!-- Button to Delete Loan -->
+                            <form id="delete-form-<%= loan.LoanID %>" action="/loans/<%= loan.LoanID %>" method="POST" onsubmit="return handleFormSubmit(event, '<%= loan.LoanID %>', 'DELETE')">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <button type="submit">Delete</button>
+                            </form>
                         </td>
                     </tr>
                 <% }) %>
@@ -121,24 +121,24 @@
                         <td><%= detail.LoanID %></td>
                         <td><%= detail.BookID %></td>
                         <td><%= detail.IndividualFee %></td>
-                        <td class="actions">
-                            <div class="action-form">
-                                <form action="/loan-details/<%= detail.DetailID %>?_method=PUT" method="POST">
-                                    <input type="hidden" name="detailID" value="<%= detail.DetailID %>" required>
-                                    <label for="loanID">Loan ID:</label>
-                                    <input type="number" id="loanID" name="loanID" value="<%= detail.LoanID %>" required>
-                                    <label for="bookID">Book ID:</label>
-                                    <input type="number" id="bookID" name="bookID" value="<%= detail.BookID %>" required>
-                                    <label for="individualFee">Individual Fee:</label>
-                                    <input type="number" id="individualFee" name="individualFee" value="<%= detail.IndividualFee %>" required>
-                                    <button type="submit" class="action-btn update">Update</button>
-                                </form>
-                            </div>
-                            <div class="action-form">
-                                <form action="/loan-details/<%= detail.DetailID %>?_method=DELETE" method="POST">
-                                    <button type="submit" class="action-btn delete">Delete</button>
-                                </form>
-                            </div>
+                        <td>
+                            <!-- Form to Update Loan Detail -->
+                            <form id="update-form-<%= detail.DetailID %>" action="/loan-details/<%= detail.DetailID %>" method="POST" onsubmit="return handleFormSubmit(event, '<%= detail.DetailID %>', 'PUT')">
+                                <input type="hidden" name="_method" value="PUT">
+                                <label for="loanID">Loan ID:</label>
+                                <input type="number" id="loanID" name="loanID" value="<%= detail.LoanID %>" required>
+                                <label for="bookID">Book ID:</label>
+                                <input type="number" id="bookID" name="bookID" value="<%= detail.BookID %>" required>
+                                <label for="individualFee">Individual Fee:</label>
+                                <input type="number" id="individualFee" name="individualFee" value="<%= detail.IndividualFee %>" required>
+                                <button type="submit">Update</button>
+                            </form>
+
+                            <!-- Button to Delete Loan Detail -->
+                            <form id="delete-form-<%= detail.DetailID %>" action="/loan-details/<%= detail.DetailID %>" method="POST" onsubmit="return handleFormSubmit(event, '<%= detail.DetailID %>', 'DELETE')">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <button type="submit">Delete</button>
+                            </form>
                         </td>
                     </tr>
                 <% }) %>
@@ -152,5 +152,26 @@
     <footer>
         <p>&copy; 2024 Library Management System, Ross, Cody, Andrew</p>
     </footer>
+    <script>
+        async function handleFormSubmit(event, id, method) {
+            event.preventDefault();
+            const form = event.target;
+            const action = form.action;
+
+            const response = await fetch(action, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams(new FormData(form))
+            });
+
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                console.error('An error occurred:', await response.text());
+            }
+        }
+    </script>
 </body>
 </html>
